@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<head>
+    <title>Profile form</title>
+    <script>
+        function foo() {
+            const para = document.createElement("p");
+            para.innerHTML = "This is a paragraph.";
+
+            document.getElementById("myDIV").appendChild(para);
+            return true;
+        }
+    </script>
+
+</head>
+<body>
+    <div id="myDIV" style="padding:16px;background-color:lightgray">
+        <h3>A DIV element</h3>
+    </div>
+
+
+    <button id="b1" onclick="return foo();">Button</button>
+
+    <form method="POST" action="/profile-upload-single" enctype="multipart/form-data">
+        <div>
+            <label>Upload profile picture</label>
+            <input type="file" name="profile-file" required/>
+        </div>
+        <div>
+            <input type="submit" value="Upload" />
+        </div>
+    </form>
+
+    <hr>
+
+    <form method="POST" action="/profile-upload-multiple" enctype="multipart/form-data">
+        <div>
+            <label>Upload multiple profile picture</label>
+            <input type="file" name="profile-files" required multiple  />
+        </div>
+        <div>
+            <input type="submit" value="Upload" />
+        </div>
+    </form>
+</body>
+</html>

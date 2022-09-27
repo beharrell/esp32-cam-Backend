@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<head>
+    <title>Configure Parameters</title>
+
+    <style>
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 30px;
+            height: 16px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 13px;
+            width: 13px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        input:checked+.slider {
+            background-color: #2196F3;
+        }
+
+        input:focus+.slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked+.slider:before {
+            -webkit-transform: translateX(13px);
+            -ms-transform: translateX(13px);
+            transform: translateX(13px);
+        }
+
+        .slider.round {
+            border-radius: 17px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+        .collapsible {
+            background-color: #777;
+            color: white;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+        }
+
+        .active,
+        .collapsible:hover {
+            background-color: #555;
+        }
+
+        .content {
+            padding: 0 18px;
+            display: none;
+            overflow: hidden;
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        function SendUploadParams() {
+            fetch("/setParams", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(uploadParams),
+            });
+        }
+
+        function IntermidateImageChecked(isChecked) {
+            uploadParams.saveIntermidiate = isChecked;
+            SendUploadParams();
+        }
+
+        function SliderValueChanged(value, send, fieldName, unit = 1) {
+            uploadParams[fieldName] = value * unit;
+            var output = document.getElementById(fieldName + "Value");
+            output.innerHTML = uploadParams[fieldName] / unit;
+            if (send) {
+                SendUploadParams();
+            }
+        }
+
+        function InitSliderValue(value, fieldName, unit = 1)
+        {
+            var output = document.getElementById(fieldName + "Value");
+            output.innerHTML = value[fieldName] / unit;
+            output = document.getElementById(fieldName);
+            output.value = value[fieldName] / unit;
+        }
+
+
+        fetch("/params", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }).then(response => response.json())
+            .then(json => {
+                console.log(json);
+                uploadParams = json;
+                InitSliderValue(uploadParams, "monitorUploadCount");
+                InitSliderValue(uploadParams, "threshold");
+                InitSliderValue(uploadParams, "halfDilationKernelSize");
+                InitSliderValue(uploadParams, "halfErrodeKernelSize");
+                InitSliderValue(uploadParams, "movementPixelCount");
+                InitSliderValue(uploadParams, "ignorePixelCount");
+                InitSliderValue(uploadParams, "detectionUploadCount");
+                InitSliderValue(uploadParams, "monitorSleepTime", 1000000);
+                InitSliderValue(uploadParams, "detectionSleepTime", 1000000);
+                var toggle = document.getElementById("saveIntermidate");
+                toggle.checked = uploadParams.saveIntermidiate;
+            });
+        var uploadParams = null;
+
+        var coll = document.getElementsByClassName("collapsible");
+        var i;
+
+        for (i = 0; i < coll.length; i++) {
+            coll[i].addEventListener("click", function () {
+                this.classList.toggle("active");
+                var content = this.nextElementSibling;
+                if (content.style.display === "block") {
+                    content.style.display = "none";
+                } else {
+                    content.style.display = "block";
+                }
+            });
+        }
+    </script>
+
+    <button type="button" class="collapsible">General Params</button>
+    <div class="content">
+        <h3>Save intermidate images </h3>
+        <label class="switch">
+            <input id="saveIntermidate" type="checkbox" onclick="IntermidateImageChecked(this.checked)" checked>
+            <span class="slider round"></span>
+        </label>
+
+        <h3>Monitoring cached image count</h3>
+        <input type="range" id="monitorUploadCount" name="points" min="2" max="30"
+            onmousemove="SliderValueChanged(this.value, false, 'monitorUploadCount')"
+            onchange="SliderValueChanged(this.value, true, 'monitorUploadCount')">
+        <label id="monitorUploadCountValue" for="monitorUploadCount"> value </label>
+
+        <h3>Monitoring sleep time</h3>
+        <input type="range" id="monitorSleepTime" name="points" min="1" max="600" style="width: 50%;"
+            onmousemove="SliderValueChanged(this.value, false,'monitorSleepTime', 1000000)"
+            onchange="SliderValueChanged(this.value, true,'monitorSleepTime', 1000000)">
+        <label id="monitorSleepTimeValue" for="monitorSleepTime"> value </label>
+
+        <h3>Detection cached image count</h3>
+        <input type="range" id="detectionUploadCount" name="points" min="2" max="30"
+            onmousemove="SliderValueChanged(this.value, false,'detectionUploadCount')"
+            onchange="SliderValueChanged(this.value, true,'detectionUploadCount')">
+        <label id="detectionUploadCountValue" for="detectionUploadCount"> value </label>
+
+        <h3>Detection sleep time</h3>
+        <input type="range" id="detectionSleepTime" name="points" min="1" max="600" style="width: 50%;"
+            onmousemove="SliderValueChanged(this.value, false,'detectionSleepTime', 1000000)"
+            onchange="SliderValueChanged(this.value, true,'detectionSleepTime', 1000000)">
+        <label id="detectionSleepTimeValue" for="detectionSleepTime"> value </label>
+    </div>
+
+    <button type="button" class="collapsible">Motion Detection Params</button>
+    <div class="content">
+        <h3>Threshold limit</h3>
+        <input type="range" id="threshold" name="points" min="1" max="255" style="width: 50%;"
+            onmousemove="SliderValueChanged(this.value, false,'threshold')"
+            onchange="SliderValueChanged(this.value, true,'threshold')">
+        <label id="thresholdValue" for="threshold"> value </label>
+
+        <h3>Movement Pixel Count</h3>
+        <input type="range" id="movementPixelCount" name="points" min="1" max="200" style="width: 50%;"
+            onmousemove="SliderValueChanged(this.value, false,'movementPixelCount')"
+            onchange="SliderValueChanged(this.value, true,'movementPixelCount')">
+        <label id="movementPixelCountValue" for="movementPixelCount"> value </label>
+
+        <h3>Ignore Pixel Count</h3>
+        <input type="range" id="ignorePixelCount" name="points" min="1" max="10" style="width: 50%;"
+            onmousemove="SliderValueChanged(this.value, false,'ignorePixelCount')"
+            onchange="SliderValueChanged(this.value, true,'ignorePixelCount')">
+        <label id="ignorePixelCountValue" for="ignorePixelCount"> value </label>
+
+        <h3>Half Dilation Kernel Size</h3>
+        <input type="range" id="halfDilationKernelSize" name="points" min="1" max="6" style="width: 50%;"
+            onmousemove="SliderValueChanged(this.value, false,'halfDilationKernelSize')"
+            onchange="SliderValueChanged(this.value, true,'halfDilationKernelSize')">
+        <label id="halfDilationKernelSizeValue" for="halfDilationKernelSize"> value </label>
+
+        <h3>Half Errode Kernel Size</h3>
+        <input type="range" id="halfErrodeKernelSize" name="points" min="1" max="6" style="width: 50%;"
+            onmousemove="SliderValueChanged(this.value, false,'halfErrodeKernelSize')"
+            onchange="SliderValueChanged(this.value, true,'halfErrodeKernelSize')">
+        <label id="halfErrodeKernelSizeValue" for="halfErrodeKernelSize"> value </label>
+    </div>
+
+
+
+    <script>
+        var coll = document.getElementsByClassName("collapsible");
+        var i;
+
+        for (i = 0; i < coll.length; i++) {
+            coll[i].addEventListener("click", function () {
+                this.classList.toggle("active");
+                var content = this.nextElementSibling;
+                if (content.style.display === "block") {
+                    content.style.display = "none";
+                } else {
+                    content.style.display = "block";
+                }
+            });
+        }
+    </script>
+</body>
