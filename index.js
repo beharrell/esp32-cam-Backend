@@ -3,7 +3,7 @@ var express = require('express')
 var multer = require('multer')
 var bodyParser = require("body-parser");
 const fs = require('fs');
-var port = 3000;
+const PORT = process.env.PORT || 8080;
 var saveIntermidiateImages = true;
 var uploadParams =
 {
@@ -57,6 +57,10 @@ app.get('/params', function (req, res, next) {
   res.send(json);
 });
 
+app.post("/post", (req, res) => {
+  console.log("Connected to React");
+  res.redirect("/");
+});
 
 app.get('/found', function (req, res, next) {
   console.log("Building script");
@@ -126,4 +130,4 @@ app.post('/profile-upload-multiple', upload.array('profile-files', 12), function
 })
 
 
-app.listen(port, () => console.log(`Server running on port ${port}! :) ${new Date().toLocaleTimeString('en-US', { hour12: false }).replaceAll(":", "_")}`))
+app.listen(PORT, () => console.log(`Server running on port ${PORT}! :) ${new Date().toLocaleTimeString('en-US', { hour12: false }).replaceAll(":", "_")}`))
