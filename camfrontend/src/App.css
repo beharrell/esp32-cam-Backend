@@ -1,27 +1,53 @@
+html {
+  box-sizing: border-box;
+}
 
+*, *::before, *::after {
+  box-sizing: inherit;
+  padding: 0;
+  margin: 0;
+}
 
+.app {
+  width: 960px;
+  margin: 0 auto;
+  padding: 20px;
+}
 
-.collapsible {
-  background-color: #777;
+nav ul {
+  list-style: none;
+  display: flex;
+  background-color: black;
+  margin-bottom: 20px;
+}
+
+nav ul li {
+  padding: 20px;
+}
+
+nav ul li a {
   color: white;
-  cursor: pointer;
-  padding: 18px;
-  width: 100%;
-  border: none;
-  text-align: left;
-  outline: none;
-  font-size: 15px;
+  text-decoration: none;
 }
 
-.active,
-.collapsible:hover {
-  background-color: #555;
+.current {
+  border-bottom: 4px solid white;
 }
 
-.content {
-  padding: 0 18px;
-  display: none;
-  overflow: hidden;
-  background-color: #f1f1f1;
+h1 {
+  margin-bottom: 20px;
 }
 
+p {
+  margin-bottom: 15px;
+}
+
+.current {
+  border-bottom: 4px solid white;
+}
+
+
+.container img {
+  float: left;
+  width: 50%;
+}

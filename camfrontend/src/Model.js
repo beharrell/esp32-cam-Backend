@@ -1,7 +1,8 @@
+
 class Model {
     constructor() {
         this.uploadParams = {};
-        this.listeners=[];
+        this.listeners = [];
 
         fetch("../../params", {
             method: "GET",
@@ -15,14 +16,12 @@ class Model {
             })
     }
 
-    Listen = (handler) =>
-    {
+    Listen = (handler) => {
         this.listeners.push(handler);
     }
 
-    UpdateListeners = () =>
-    {
-        this.listeners.forEach((listener) => {listener();});
+    UpdateListeners = () => {
+        this.listeners.forEach((listener) => { listener(); });
     }
 
     SendUploadParams = () => {

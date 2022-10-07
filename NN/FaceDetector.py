@@ -1,5 +1,7 @@
+from genericpath import exists
 from mtcnn import MTCNN
 import cv2
+import os
 import time
 from os import listdir, remove, rename
 from os.path import isfile, join
@@ -22,10 +24,24 @@ def ListFiles(path):
         if FileIsclosed(fileName) == False:
             time.sleep(5)
 
+        cameraName = file.split('_')[1]
+        dirName = path + "processedImages/" + cameraName
+        if os.path.isdir(dirName) is False:
+            os.makedirs(dirName)
+            os.makedirs(dirName + "/faces")
+            os.makedirs(dirName + "/detect")
+            os.makedirs(dirName + "/current")
+
         if detectFace(fileName):
             print("Found face in " + file)
-            newName = path + "processedImages/" + file
+            newName = dirName + "/faces/" + file
             rename(fileName, newName) 
+        elif "current" in file:
+            newName = dirName + "/current/" + file
+            rename(fileName, newName) 
+        elif "detect" in file:
+            newName = dirName + "/detect/" + file
+            rename(fileName, newName)
         else:
             remove(fileName)
 

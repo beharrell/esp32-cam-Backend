@@ -51,7 +51,7 @@ app.post('/setParams', function (req, res) {
 
 app.get('/params', function (req, res, next) {
   console.log("Get called on /params");
-  uploadParams.time = new Date().toLocaleTimeString('en-US', { hour12: false }).replaceAll(":", "_");
+  uploadParams.time = new Date().toLocaleTimeString('en-US', { hour12: false }).replaceAll(":", "");
   var json = JSON.stringify(uploadParams);
   console.log(json);
   res.send(json);
