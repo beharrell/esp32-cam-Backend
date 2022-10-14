@@ -1,10 +1,11 @@
 'use strict';
+var CameraManager = require('./cameraManager')
 var express = require('express')
 var multer = require('multer')
 var bodyParser = require("body-parser");
 const fs = require('fs');
+const cors = require("cors");
 const PORT = process.env.PORT || 8080;
-var saveIntermidiateImages = true;
 var uploadParams =
 {
   detectionSleepTime: 1000000,
@@ -22,6 +23,10 @@ var uploadParams =
 };
 
 var app = express()
+let cameraManager = new CameraManager();
+
+
+
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -38,10 +43,32 @@ app.use('/a',express.static('/b'));
 Above line would serve all files/folders inside of the 'b' directory
 And make them accessible through http://localhost:3000/a.
 */
+app.use(cors());
 app.use(express.static(__dirname + '/public'));
 app.use('/uploads', express.static('uploads'));
 app.use(express.json({ extended: false }));
+app.set('trust proxy', true)
 const testFolder = 'uploads/processedImages/';
+
+function eventsHandler(request, response, next) {
+  const headers = {
+    'Content-Type': 'text/event-stream',
+    'Connection': 'keep-alive',
+    'Cache-Control': 'no-cache'
+  };
+  response.writeHead(200, headers);
+  cameraManager.setClient(response);
+
+  //response.write(`data: ${JSON.stringify(camera)}\n\n`);
+  console.log("Added listener");
+
+  request.on('close', () => {
+    console.log(`client Connection closed`);
+    response = null;
+  });
+}
+
+app.get('/events', eventsHandler);
 
 app.post('/setParams', function (req, res) {
   uploadParams = req.body;

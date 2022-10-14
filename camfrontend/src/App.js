@@ -3,7 +3,7 @@ import React from 'react';
 import { NavLink, Routes, Route } from 'react-router-dom';
 //import ReactDOM from 'react-dom/client';
 import SliderField from './SliderField';
-import ImageDisplay from './ImageDisplay';
+import Images from './ImageDisplay';
 
 
 
@@ -31,19 +31,20 @@ const Main = () => (
     <Route exact path='/ProcessingParams' element={<ProcessingParams />}></Route>
     <Route exact path='/PowerSavingParams' element={<PowerSavingParams />}></Route>
     <Route exact path='/Images' element={<Images />}></Route>
+    <Route exact path='/' element={<Images />}></Route>
   </Routes>
 );
 
 const ProcessingParams = () => (
   <div className='processingParams'>
     <SliderField fieldName="saveIntermidiate" min="0" max="1" units="1" />
-    <br/>
+    <br />
     <SliderField fieldName="monitorSleepTime" min="1" max="600" units="1000000" />
-    <br/>
+    <br />
     <SliderField fieldName="detectionSleepTime" min="1" max="600" units="1000000" />
-    <br/>
+    <br />
     <SliderField fieldName="monitorUploadCount" min="2" max="30" units="1" />
-    <br/>
+    <br />
     <SliderField fieldName="detectionUploadCount" min="2" max="30" units="1" />
   </div>
 );
@@ -51,22 +52,18 @@ const ProcessingParams = () => (
 const PowerSavingParams = () => (
   <div className='powerSavingParams'>
     <SliderField fieldName="threshold" min="1" max="255" units="1" />
-    <br/>
+    <br />
     <SliderField fieldName="movementPixelCount" min="1" max="200" units="1" />
-    <br/>
+    <br />
     <SliderField fieldName="ignorePixelCount" min="1" max="8" units="1" />
-    <br/>
+    <br />
     <SliderField fieldName="halfDilationKernelSize" min="1" max="6" units="1" />
-    <br/>
+    <br />
     <SliderField fieldName="halfErrodeKernelSize" min="1" max="6" units="1" />
   </div>
 );
 
-const Images = () => (
-  <div className='images'>
-    <ImageDisplay />
-  </div>
-);
+
 
 function App() {
   return (
