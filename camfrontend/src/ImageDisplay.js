@@ -1,4 +1,3 @@
-import multer from 'multer';
 import React from 'react';
 
 class Images extends React.Component {
@@ -9,14 +8,13 @@ class Images extends React.Component {
             currentImage: "None",
             detectImage: "None",
             detectedImages: [],
-            timeStamp: ""
+            currentTimeStamp: "",
+            detectedTimeStamp: ""
         };
     }
 
-    HandleNewImage(imageData)
-    {
-        if (imageData === null)
-        {
+    HandleNewImage(imageData) {
+        if (imageData === null) {
             return
         }
 
@@ -24,22 +22,28 @@ class Images extends React.Component {
             this.setState({ currentImage: '../../' + imageData.current })
             var nameParts = imageData.current.split("_")
             var timestamp = nameParts[nameParts.length - 2] + " " + nameParts[nameParts.length - 1]
-            this.setState({ timeStamp: timestamp })
+            this.setState({ currentTimeStamp: timestamp })
         }
 
         if (imageData.detect != null) {
             var imageName = '../../' + imageData.detect
             if (!this.state.detectedImages.includes(imageName)) {
-                var nameParts = imageData.current.split("_")
+                nameParts = imageData.detect.split("_")
                 var imageSeries = nameParts[nameParts.length - 2]
-                if (this.state.detectedImages.length !== 0 &&
+                console.log(`series ${imageSeries}`);
+                if (this.state.detectedImages.length === 0 ||
                     !this.state.detectedImages[0].includes(imageSeries)) {
-                    this.setState({ detectedImages: [imageName] });
+                    console.log("Setting " + imageName);
+                    this.setState({
+                        detectedImages: [imageName],
+                        detectedTimeStamp: imageSeries,
+                    });
+
                 }
                 else {
-                    this.setState(prevState => ({
-                        imageName: [...prevState.detectedImages, imageName]
-                    }))
+                    console.log("Adding " + imageName);
+                    this.setState({ detectedImages: this.state.detectedImages.concat([imageName]) })
+                    console.log(`list len ${this.state.detectedImages.length}`);
                 }
 
                 this.setState({ detectImage: imageName })
@@ -51,29 +55,38 @@ class Images extends React.Component {
         console.log("From " + window.location.origin);
         if (this.state.events == null) {
             console.log("Requesting event source");
-            this.state.events = new EventSource('http://localhost:8080/../../events');
+            var callBack = new EventSource('http://localhost:8080/../../events');
 
-            this.state.events.onmessage = (event) => {
+            callBack.onmessage = (event) => {
                 const parsedData = JSON.parse(event.data);
                 console.log("Got Message" + event.data);
                 this.HandleNewImage(parsedData)
             }
+            callBack.onerror = (event) => {
+                console.log("Got error ");
+            }
+            callBack.onopen = (event) => {
+                console.log("Opened connection to " + this.state.events.url);
+            }
+            this.setState({ events: callBack });
         }
-        this.state.events.onerror = (event) => {
-            console.log("Got error ");
-        }
-        this.state.events.onopen = (event) => {
-            console.log("Opened connection to " + this.state.events.url);
-        }
+
     }
 
     render() {
         return <div>
-            <img id="current" src={this.state.currentImage} />
+            <h2>Current</h2>
+            <img id="current" src={this.state.currentImage} alt="current" />
             <br />
-            {this.state.timeStamp}
+            {this.state.currentTimeStamp}
             <br />
-            <img  id="detect" src={this.state.detectImage} />
+            <h2>Detected</h2>
+            {this.state.detectedTimeStamp}
+            <br />
+            {
+                this.state.detectedImages.map(function (d, idx) {
+                    return (<img id={idx} src={d} alt={d} width="160" />)
+                })}
         </div>
     }
 }
